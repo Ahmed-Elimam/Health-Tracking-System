@@ -13,9 +13,15 @@ const userSchema = new Schema({
         state: { type: String },
         country: { type: String },
     },
-    profilePicture: { type: String },
+    profileImage: { type: String },
     dateOfBirth: { type: Date },
-    role: { type: String, required: true, enum: ['patient', 'doctor', 'admin'] },
+    role: { type: String, enum: ['patient', 'doctor', 'admin'], default: 'patient' },
+    currentlyActive: { type: Boolean, default: true },
+    emailVerified: { type: Boolean, default: false },
+    phoneVerified: { type: Boolean, default: false },
+    passwordResetToken: { type: String, select: false },
+    passwordChangedAt: { type: Date },
+    passwordResetExpires: { type: Date },
     token: { type: String, select: false },
 },{ timestamps: true });
 
