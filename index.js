@@ -4,7 +4,7 @@ require('dotenv').config();
 const mongoose = require('./config/dbConnection');
 
 const app = express();
-const port = 3000
+const port = 7070;
 mongoose.connect;
 
 //Middlewares
@@ -13,7 +13,7 @@ app.use(express.json());
 //Routes
 const authRouter = require('./routes/auth.router');
 
-app.use('auth',authRouter); 
+app.use('/auth',authRouter); 
 
 //Global error handler
 app.use((errorHandler));
