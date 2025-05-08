@@ -5,7 +5,7 @@ const mongoose = require("./config/dbConnection");
 
 const app = express();
 const port = 7070;
-mongoose.connect;
+// mongoose.connect;
 
 //Middlewares
 app.use(express.json());
