@@ -6,7 +6,7 @@ const userSchema = new Schema({
     email: { type: String, required: true, unique: true, match: /.+\@.+\..+/ },
     nationalId: { type: String, required: true, unique: true, match: /^[0-9]{14}$/ },
     password: { type: String, required: true, select: false, match: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/ },
-    phone: { type: String, required: true, match: /^01[0-2,5][0-9]{8}$/ },
+    phone: [{ type: String, required: true, match: /^01[0-2,5][0-9]{8}$/ }],
     address: {
         street: { type: String },
         city: { type: String },
