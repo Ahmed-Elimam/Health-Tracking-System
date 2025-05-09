@@ -30,24 +30,25 @@ const register = async (req, res, next) => {
     }
   };
   
-const login = async (req, res) => {
-    try{
-        const {email, password} = req.body;
-        const user = await User.findOne({email});
-        if(!user){
-            throw new AppError("Invalid Credentials", 401);
+    const login = async (req, res) => {
+        try{
+            const {email, password} = req.body;
+            const user = await User.findOne({email}).select('+password');
+            if(!user){
+                throw new AppError("Invalid Credentials", 401);
+            }
+            const isMatch = await bcrypt.compare(password, user.password);
+            if(!isMatch){
+                throw new AppError("Invalid Credentials", 401);
+            }
+            const token = jwt.sign({id: user._id , role: user.role},process.env.JWT_SECRET, {expiresIn: '1h'});
+            const userData = user.toObject();
+            delete userData.password;
+            res.status(200).json({token, user: userData});
+        } catch (error) {
+            next(error);
         }
-        const isMatch = await bcrypt.compare(password, user.password);
-        if(!isMatch){
-            throw new AppError("Invalid Credentials", 401);
-        }
-        const token = jwt.sign({id: user._id , role: user.role},process.env.JWT_SECRET, {expiresIn: '1h'});
-        res.status(200).json({token});
-    } catch (error) {
-        next(error);
     }
-
-}
 
 module.exports = {
     register,
