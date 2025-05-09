@@ -17,7 +17,7 @@ const verifyToken = (req, res, next) => {
       return next(new AppError("access denied", 401));
     }
   } catch (error) {
-    return next(new AppError("Invalid token"));
+    return next(new AppError("Invalid token", 401));
   }
 };
 

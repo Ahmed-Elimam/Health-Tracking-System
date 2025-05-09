@@ -1,0 +1,92 @@
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const AppError = require('../utils/AppError');
+const User = require('../models/User');
+const Patient = require('../models/Patient');
+const Doctor = require('../models/Doctor');
+const Specialization = require('../models/Specialization');
+
+exports.registerUser = async(userData) => {
+    const {
+        firstName, lastName, email, password,
+        nationalId, phone, specializationName, certificates, bio, experience, plan
+    } = userData;
+
+    if (!firstName || !lastName || !email || !password || !nationalId || !phone) {
+        throw new AppError("All fields are required", 400);
+    }
+
+    const emailExists = await User.findOne({ email });
+    if (emailExists) {
+        throw new AppError("Email already in use", 400);
+    }
+
+    const nationalIdExists = await User.findOne({ nationalId });
+    if (nationalIdExists) {
+        throw new AppError("National ID already in use", 400);
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    const newUser = await User.create({
+              firstName,
+              lastName,
+              email,
+              password: hashedPassword,
+              nationalId,
+              phone});
+    
+    if (specializationName) {
+        const specialization = await Specialization.findOne({ name: specializationName });
+        if (!specialization) {
+            throw new AppError("Specialization not found", 400);
+        }
+
+        await Doctor.create({
+            userId: newUser._id,
+            specialization: specialization._id,
+            certificates,
+            bio,
+            experience});
+        }
+
+    if (plan) {
+        await Patient.create({
+            userId: newUser._id,
+            plan});
+    }
+    return newUser;
+}
+
+exports.userLogin = async (userLoginData) =>{
+    const { email, password } = userLoginData;
+    const user = await User.findOne({ email }).select('+password');
+    if (!user) {
+    throw new AppError("Invalid Credentials", 401);
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+    throw new AppError("Invalid Credentials", 401);
+    }
+
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    let fullUserData = user.toObject();
+    delete fullUserData.password;
+
+    if (user.role === 'patient') {
+    const patientData = await Patient.findOne({ userId: user._id }).populate('userId');
+    if (patientData){
+        fullUserData = patientData;
+    } 
+    }
+
+    if (user.role === 'doctor') {
+    const doctorData = await Doctor.findOne({ userId: user._id }).populate('userId specialization');
+    if (doctorData){
+        fullUserData = doctorData;
+    }
+    }
+    return {token, fullUserData}
+}
