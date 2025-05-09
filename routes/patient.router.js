@@ -2,26 +2,17 @@ const express = require("express");
 const router = express.Router();
 const patientController = require("../controllers/patient.controller");
 const roleMiddleware = require("../middlewares/roleMiddleware.js");
+const verifyToken = require("../middlewares/authValidation");
+const { authorizeRole } = require("../middlewares/roleMiddleware");
+const { checkOwnership } = require("../middlewares/checkOwnership");
 
 router
   .route("/")
-  .get(roleMiddleware.authorizeRole(["admin"]), patientController.getPatients)
-  .post(
-    roleMiddleware.authorizeRole(["admin"]),
-    patientController.createPatient
-  );
+  .get(verifyToken, authorizeRole("admin"), patientController.getPatients)
+  .post(verifyToken, authorizeRole("admin"), patientController.createPatient);
 router
   .route("/:id")
-  .get(
-    roleMiddleware.authorizeRole(["admin", "doctor"]),
-    patientController.getPatient
-  )
-  .patch(
-    roleMiddleware.authorizeRole(["admin", "patient"]),
-    patientController.updatePatient
-  )
-  .delete(
-    roleMiddleware.authorizeRole(["admin"]),
-    patientController.deletePatient
-  );
+  .get(verifyToken, authorizeRole("admin", "patient"), checkOwnership, patientController.getPatient)
+  .patch(verifyToken, authorizeRole("admin", "patient"), checkOwnership, patientController.updatePatient)
+  .delete(verifyToken, authorizeRole("admin"),checkOwnership, patientController.deletePatient);
 module.exports = router;
