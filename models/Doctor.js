@@ -15,9 +15,8 @@ const doctorSchema = new Schema({
     },
     bio: { type: String, required: true },
     experience: { type: Number, required: true, min: 0 },
-    patients: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Patient' }],
     roleStatus: { type: String, enum: ['pending','approved','declined'], default:'pending'}
-});
+},);
 
 const Doctor = mongoose.model('Doctor', doctorSchema);
 module.exports = Doctor;

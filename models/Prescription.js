@@ -4,6 +4,7 @@ const prescriptionSchema = new Schema({
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     doctorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor', required: true},
     patientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Patient', required: true },
+    checkupId: { type: mongoose.Schema.Types.ObjectId, ref: 'Checkup', required: true },
     date: { type: Date},
     treatments: [
         {
