@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const userSchema = new Schema({
     firstName: { type: String, required: true, match: /^[a-zA-Z]+$/ },
-    lastName: { type: String, required: true, match: /^[a-zA-Z]+$/ },
+    lastName: { type: String, required: true, match: /^[a-zA-Z-]+$/ },
     email: { type: String, required: true, unique: true, match: /.+\@.+\..+/ },
     nationalId: { type: String, required: true, unique: true, match: /^[0-9]{14}$/ },
-    password: { type: String, required: true, select: false, match: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/ },
+    password: { type: String, required: true, select: false },
     phone: [{ type: String, required: true, match: /^01[0-2,5][0-9]{8}$/ }],
     address: {
         street: { type: String },
