@@ -15,7 +15,7 @@ const userSchema = new Schema({
     },
     profileImage: { type: String },
     dateOfBirth: { type: Date },
-    role: { type: String, enum: ['patient', 'doctor', 'admin'], default: 'patient' },
+    role: { type: String, enum: ['patient', 'doctor', 'admin', 'super-admin'], default: 'patient' },
     currentlyActive: { type: Boolean, default: true },
     emailVerified: { type: Boolean, default: false },
     phoneVerified: { type: Boolean, default: false },

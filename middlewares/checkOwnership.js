@@ -5,7 +5,7 @@ const checkOwnership = (req, res, next) => {
     const userRole = req.user.role
     const reqUserId = req.param.id
 
-    if(userRole == "admin"){
+    if(userRole == "admin" || userRole == "super-admin"){
         return next();
     }
     
