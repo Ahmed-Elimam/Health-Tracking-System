@@ -1,5 +1,5 @@
 const Thread = require('../models/Thread');
-const { parasQueryParams } = require('../utils/parasQueryParams');
+const { parasQueryParams } = require('../utils/queryParser');
 exports.getThreads = async (query) => {
     const { filters, sorts } = parasQueryParams(query);
     return await Thread.find(filters).sort(sorts);

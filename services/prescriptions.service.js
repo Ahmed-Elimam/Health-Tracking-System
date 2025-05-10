@@ -1,5 +1,5 @@
 const Prescription = require('../models/Prescription');
-const parasQueryParams = require('../utils/parasQueryParams');
+const parasQueryParams = require('../utils/queryParser');
 exports.getPrescriptions = async (query) => {
     const {filters,sorts} = parasQueryParams(query);
     return await Prescription.find(filters).sort(sorts);

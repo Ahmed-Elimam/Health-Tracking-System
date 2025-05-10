@@ -1,5 +1,5 @@
 const User = require("../models/User");
-const { parasQueryParams } = require("../utils/parseQueryParams");
+const { parasQueryParams } = require("../utils/queryParser");
 
 exports.getAdmins = async (query) => {
     const { filters, sorts } = parasQueryParams(query);

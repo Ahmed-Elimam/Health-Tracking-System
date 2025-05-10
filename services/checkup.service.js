@@ -1,5 +1,5 @@
 const Checkup = require("../models/Checkup");
-const { parasQueryParams } = require("../utils/parasQueryParams");
+const { parasQueryParams } = require("../utils/queryParser");
 
 exports.getCheckups = async (query) => {
     const { filters, sorts } = parasQueryParams(query);

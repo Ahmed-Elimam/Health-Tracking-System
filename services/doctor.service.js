@@ -1,5 +1,5 @@
 const Doctor = require('../models/Doctor');
-const {parasQueryParams} = require('../utils/parasQueryParams');
+const {parasQueryParams} = require('../utils/queryParser');
 
 exports.getDoctors = async (query) => {
     const {filters, sorts} = parasQueryParams(query);
