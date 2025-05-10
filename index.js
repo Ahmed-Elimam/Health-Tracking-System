@@ -1,8 +1,7 @@
 const express = require("express");
 const errorHandler = require("./middlewares/errorHandler");
 require("dotenv").config();
-const mongoose = require("./config/dbConnection");
-
+// require("./seeds/seedUsers");
 const app = express();
 const port = 7070;
 // mongoose.connect;
