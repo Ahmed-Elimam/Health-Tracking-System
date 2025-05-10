@@ -1,8 +1,24 @@
 const Patient = require("../models/Patient");
-const { parasQueryParams } = require("../utils/queryParser");
+const Treating = require("../models/Treating");
+const { parseQueryParams } = require("../utils/parseQueryParams");
 exports.getPatients = async (query) => {
-  const { filters, sorts } = parasQueryParams(query);
+  const { filters, sorts } = parseQueryParams(query);
   return await Patient.find(filters).sort(sorts).populate("userId");
+};
+exports.getDoctorPatients = async (docId) => {
+  // const { filters, sorts } = parseQueryParams(query);
+  // const treatingsCount = await Treating.countDocuments({ doctorId: docId });
+  // console.log(treatingsCount);
+
+  let treatings = await Treating.find({ doctorId: docId }).populate({
+    path: "patientId",
+    populate: { path: "userId" },
+  });
+  // .sort(sorts);
+  console.log(treatings);
+
+  const patients = treatings.map((t) => t.patientId);
+  return patients;
 };
 exports.getPatient = async (userId) => {
   return await Patient.findOne({ userId: userId });

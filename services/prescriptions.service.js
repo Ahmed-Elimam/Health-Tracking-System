@@ -1,22 +1,26 @@
-const Prescription = require('../models/Prescription');
-const parasQueryParams = require('../utils/queryParser');
+const Prescription = require("../models/Prescription");
+const { parseQueryParams } = require("../utils/parseQueryParams");
 exports.getPrescriptions = async (query) => {
-    const {filters,sorts} = parasQueryParams(query);
-    return await Prescription.find(filters).sort(sorts);
-}
+  const { filters, sorts } = parseQueryParams(query);
+  return await Prescription.find(filters).sort(sorts);
+};
 
 exports.getPrescriptionById = async (prescriptionId) => {
-    return await Prescription.findById(prescriptionId);
-}
+  return await Prescription.findById(prescriptionId);
+};
 
-exports.createPrescription = async(prescriptionData) => {
-    return await Prescription.create(prescriptionData);
-}
+exports.createPrescription = async (prescriptionData) => {
+  return await Prescription.create(prescriptionData);
+};
 
 exports.updatePrescription = async (prescriptionId, prescriptionData) => {
-    return await Prescription.findByIdAndUpdate(prescriptionId, prescriptionData, {new: true});
-}
+  return await Prescription.findByIdAndUpdate(
+    prescriptionId,
+    prescriptionData,
+    { new: true }
+  );
+};
 
 exports.deletePrescription = async (prescriptionId) => {
-    return await Prescription.findByIdAndDelete(prescriptionId);
-}
+  return await Prescription.findByIdAndDelete(prescriptionId);
+};
