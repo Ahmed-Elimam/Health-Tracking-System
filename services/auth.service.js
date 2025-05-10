@@ -70,15 +70,19 @@ exports.userLogin = async (userLoginData) =>{
     throw new AppError("Invalid Credentials", 401);
     }
 
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
     let fullUserData = user.toObject();
     delete fullUserData.password;
+
+    let tokenPayload = {
+        id: user._id,
+        role: user.role
+    }
 
     if (user.role === 'patient') {
     const patientData = await Patient.findOne({ userId: user._id }).populate('userId');
     if (patientData){
         fullUserData = patientData;
+        tokenPayload.patientId = patientData._id;
     } 
     }
 
@@ -86,7 +90,10 @@ exports.userLogin = async (userLoginData) =>{
     const doctorData = await Doctor.findOne({ userId: user._id }).populate('userId specialization');
     if (doctorData){
         fullUserData = doctorData;
+        tokenPayload.doctorId = doctorData._id;
     }
     }
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
+
     return {token, fullUserData}
 }
