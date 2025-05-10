@@ -1,14 +1,18 @@
-const mongoose = require("mongoose");
 const { createPatient } = require("../factories/patientFactory");
 const dbConnect = require("../config/dbConnection"); // Your DB connection logic
+const User = require("../models/User");
 
 async function seed() {
   await dbConnect();
-  for (let i = 0; i < 10; i++) {
-    await createPatient();
+
+  const userCount = await User.countDocuments();
+  const patientsUsers = await User.find({ role: 'patient' });
+
+  for (let i = 0; i < patientsUsers.length; i++) {
+    await createPatient({ user: patientsUsers[i] }, userCount);
   }
+
   console.log("Patients seeded!");
   process.exit();
 }
-
 seed();
