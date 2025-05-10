@@ -1,24 +1,25 @@
 const { faker } = require("@faker-js/faker");
 const User = require("../models/User");
+const bcrypt = require("bcrypt");
 
-const generateUserData = (overrides = {}) => {
+const generateUserData = async (overrides = {}) => {
     return {
         email: faker.internet.email(),
-        password: faker.internet.password(),
-        firstName: faker.name.firstName(),
-        lastName: faker.name.lastName(),
-        nationalId: faker.datatype.number({ min: 10000000000000, max: 99999999999999 }).toString(),
+        password:await bcrypt.hash("Password123", 10) ,
+        firstName: faker.person.firstName(),
+        lastName: faker.person.lastName(),
+        nationalId: faker.number.int({ min: 10000000000000, max: 99999999999999 }).toString(),
         phone: [
             generateEgyptianPhoneNumber(),
             generateEgyptianPhoneNumber(),
         ],
-        addEventListener:{
-            street: faker.address.streetAddress(),
-            city: faker.address.city(),
-            state: faker.address.state(),
-            country: faker.address.country(),
+        address:{
+            street: faker.location.streetAddress(),
+            city: faker.location.city(),
+            state: faker.location.state(),
+            country: faker.location.country(),
         },
-        profileImage: faker.image.imageUrl(),
+        profileImage: faker.image.avatar(),
         dateOfBirth: faker.date.past(),
         role: faker.helpers.arrayElement(["patient", "doctor", "admin"]),
         currentlyActive: faker.datatype.boolean(),
@@ -30,13 +31,13 @@ const generateUserData = (overrides = {}) => {
 }
 
 const generateEgyptianPhoneNumber = () => {
-    const prefixes = ['+2011', '+2012', '+2015', '+2010'];
+    const prefixes = ['011', '012', '015', '010'];
     const prefix = faker.helpers.arrayElement(prefixes);
     const rest = faker.string.numeric(8); // 8 random digits
     return prefix + rest;
   }
 exports.createUser = async (userData) => {
-    const data = generateUserData(userData);
+    const data = await generateUserData(userData);
     const user = await User.create(data);
     return user;
 }

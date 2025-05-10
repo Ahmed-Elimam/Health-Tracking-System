@@ -1,11 +1,18 @@
 const { faker } = require("@faker-js/faker");
 const Treating = require("../models/Treating");
-
-generateTreatingData = async (overrides = {},patientCount,doctorCount) => {
-    const randomPatient = Math.floor(Math.random() * patientCount);
-    const patientDoc = await Patient.findOne().skip(randomPatient).lean();
-    const randomDoctor = Math.floor(Math.random() * doctorCount);
-    const doctorDoc = await Doctor.findOne().skip(randomDoctor).lean();
+const Doctor = require("../models/Doctor");
+const Patient = require("../models/Patient");
+const generateTreatingData = async (overrides = {},patientCount,doctorCount) => {
+    let patientDoc = overrides.patient;
+    if(!patientDoc) {
+        const randomPatient = Math.floor(Math.random() * patientCount);
+        patientDoc = await Patient.findOne().skip(randomPatient).lean();
+    }
+    let doctorDoc = overrides.doctor;
+    if(!doctorDoc) {
+        const randomDoctor = Math.floor(Math.random() * doctorCount);
+        doctorDoc = await Doctor.findOne().skip(randomDoctor).lean();
+    }
     return {
         patientId: patientDoc._id,
         doctorId: doctorDoc._id,
@@ -17,7 +24,7 @@ generateTreatingData = async (overrides = {},patientCount,doctorCount) => {
 }
 
 exports.createTreating = async (overrides = {},patientCount,doctorCount) => {
-    const data = generateTreatingData(overrides,patientCount,doctorCount);
+    const data = await generateTreatingData(overrides,patientCount,doctorCount);
     const treating = new Treating(data);
     return await treating.save();
 }

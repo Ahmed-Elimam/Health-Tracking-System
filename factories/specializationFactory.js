@@ -1,9 +1,9 @@
 const {faker} = require("@faker-js/faker");
 const Specialization = require("../models/Specialization");
 
-exports.generateSpecializationData = (overrides = {}) => {
+const generateSpecializationData = (overrides = {}) => {
     return {
-        name: faker.unique(),
+        name: faker.lorem.word(),
         ...overrides, // allows you to overwrite any field (optional)
     };
 }

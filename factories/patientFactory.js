@@ -1,9 +1,13 @@
 const { faker } = require("@faker-js/faker");
 const Patient = require("../models/Patient");
+const User = require("../models/User");
 
- exports.generatePatientData = async(overrides = {}, userCount) => {
-  const randomUser = Math.floor(Math.random() * userCount);
-  const userDoc = await User.findOne().skip(randomUser).lean();
+const generatePatientData = async(overrides = {}, userCount) => {
+  let userDoc = overrides.user;
+  if (!userDoc) {
+    const randomUser = Math.floor(Math.random() * userCount);
+    userDoc = await User.findOne().skip(randomUser).lean();
+  }
   return {
     userId: userDoc._id,
     bloodType: faker.helpers.arrayElement([
@@ -26,11 +30,7 @@ const Patient = require("../models/Patient");
 }
 
 exports.createPatient = async (overrides = {}, userCount) => {
-  const data = generatePatientData(overrides, userCount); // create fake patient object
+  const data = await generatePatientData(overrides, userCount); // create fake patient object
   const patient = new Patient(data); // turn it into a Mongoose model
   return await patient.save(); // insert into MongoDB
 }
-module.exports = {
-  generatePatientData,
-  createPatient,
-};

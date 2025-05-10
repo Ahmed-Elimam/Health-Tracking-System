@@ -1,9 +1,12 @@
 const {faker} = require("@faker-js/faker");
 const Prescription = require("../models/Prescription");
-
-exports.generatePrescriptionData = (overrides = {},checkupCount) => {
-    const randomCheckup = Math.floor(Math.random() * checkupCount);
-    const checkupDoc = Checkup.findOne().skip(randomCheckup).lean();
+const Checkup = require("../models/Checkup");
+const generatePrescriptionData = async (overrides = {}) => {
+    let checkupDoc = overrides.checkup;
+    if(!checkupDoc) {
+        const randomCheckup = Math.floor(Math.random() * Checkup.countDocuments());
+        checkupDoc = await Checkup.findOne().skip(randomCheckup).lean();
+    }
     return {
         createdBy: checkupDoc.createdBy,
         doctorId: checkupDoc.doctorId,
@@ -38,6 +41,6 @@ exports.generatePrescriptionData = (overrides = {},checkupCount) => {
     }
 }
 exports.createPrescription = async (overrides = {}, checkupCount) => {
-    const data = generatePrescriptionData(overrides, checkupCount);
-    return await Prescription.create(generatePrescriptionData(data));
+    const data = await generatePrescriptionData(overrides, checkupCount);
+    return await Prescription.create(data);
 }
