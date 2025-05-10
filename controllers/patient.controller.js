@@ -1,46 +1,40 @@
+const Doctor = require("../models/Doctor.js");
 const PatientService = require("../services/patient.service.js");
 const AppError = require("../utils/AppError");
-exports.createPatient = async (req, res, next) => {
-  try {
-    const patient = await PatientService.createPatient(req.body);
-    res.send(patient);
-  } catch (error) {
-    next(new AppError(error.message, 500));
-  }
-};
+const catchAsync = require("../utils/catchAsync.js");
 
-exports.getPatients = async (req, res, next) => {
-  try {
+exports.createPatient = catchAsync(async (req, res, next) => {
+  const patient = await PatientService.createPatient(req.body);
+  res.send(patient);
+});
+
+exports.getPatients = catchAsync(async (req, res, next) => {
+  if (req.user.role === "doctor") {
+    const doctor = await Doctor.findOne({ userId: req.user.id });
+
+    if (!doctor) {
+      return next(new AppError("Doctor record not found", 404));
+    }
+    const patients = await PatientService.getDoctorPatients(doctor._id);
+
+    res.send(patients);
+  } else {
     const patients = await PatientService.getPatients(req.query);
     res.send(patients);
-  } catch (error) {
-    next(new AppError(error.message, 500));
   }
-};
+});
 
-exports.getPatient = async (req, res, next) => {
-  try {
-    const patient = await PatientService.getPatient(req.query.id);
-    res.send(patient);
-  } catch (error) {
-    next(new AppError(error.message, 500));
-  }
-};
+exports.getPatient = catchAsync(async (req, res, next) => {
+  const patient = await PatientService.getPatient(req.query.id);
+  res.send(patient);
+});
 
-exports.updatePatient = async (req, res, next) => {
-  try {
-    const patient = await PatientService.updatePatient(req.params.id, req.body);
-    res.send(patient);
-  } catch (error) {
-    next(new AppError(error.message, 500));
-  }
-};
+exports.updatePatient = catchAsync(async (req, res, next) => {
+  const patient = await PatientService.updatePatient(req.params.id, req.body);
+  res.send(patient);
+});
 
-exports.deletePatient = async (req, res) => {
-  try {
-    const patient = await PatientService.deletePatient(req.params.id);
-    res.send(patient);
-  } catch (error) {
-    next(new AppError(error.message, 500));
-  }
-};
+exports.deletePatient = catchAsync(async (req, res) => {
+  const patient = await PatientService.deletePatient(req.params.id);
+  res.send(patient);
+});
