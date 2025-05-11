@@ -1,7 +1,7 @@
 const Doctor = require('../models/Doctor');
 const Patient = require('../models/Patient');
 const Treating = require('../models/Treating');
-const {parasQueryParams} = require('../utils/queryParser');
+const {parseQueryParams} = require('../utils/parseQueryParams');
 
 const doctorResource_Patient = (doctor) => {
     return {Specialization: doctor.specialization,clinicAddress: doctor.clinicAddress, bio: doctor.bio, experience: doctor.experience,
@@ -10,13 +10,13 @@ const doctorResource_Patient = (doctor) => {
 }
 
 exports.getDoctors_Admin = async (query) => {
-    const {filters, sorts} = parasQueryParams(query);
-    return await Doctor.find(filters).sort(sorts).populate("userId");
+    const {filters, sorts} = parseQueryParams(query);
+    return await Doctor.find(filters).sort(sorts).populate(["userId","specialization"]);
 }
 exports.getDoctors_Patient = async (query,user) => {
-    const {filters, sorts} = parasQueryParams(query);
+    const {filters, sorts} = parseQueryParams(query);
     const patient = await Patient.findOne({userId: user.id});
-    const treatings = await Treating.find({patientId: patient._id},...filters).sort(sorts).populate("doctorId");
+    const treatings = await Treating.find({patientId: patient._id},...filters).sort(sorts).populate("doctorId specialization");
     const oldDoctors = [];
     const currentDoctors = [];
     for (let i = 0; i < treatings.length; i++) {
@@ -26,7 +26,7 @@ exports.getDoctors_Patient = async (query,user) => {
     return {oldDoctors, currentDoctors};
 }
 exports.getDoctor_Admin = async(doctorId) => {
-    return await Doctor.findById(doctorId).populate("userId");
+    return await Doctor.findById(doctorId).populate("userId specialization");
 }
 exports.getDoctor_Doctor = async(doctorId,userId) => {
     const doctor = await Doctor.findById(doctorId).populate("userId");
