@@ -17,16 +17,18 @@ const doctorRouter = require("./routes/doctor.router");
 const adminRouter = require("./routes/admin.router");
 const SpecializationRouter = require("./routes/Specialization.router");
 const TreatingRouter = require("./routes/treating.router");
+const prescriptionRouter = require("./routes/prescription.router");
+
 app.get("/", (req, res) => {
   res.send("OK");
 });
 app.use("/auth", authRouter);
-app.use("/patients", patientRouter);
-app.use("/doctors", doctorRouter);
-app.use("/admins", adminRouter);
+app.use("/api/patients", patientRouter);
+app.use("/api/admins", adminRouter);
 app.use("/api/doctors", doctorRouter);
 app.use("/api/specializations", SpecializationRouter);
 app.use("/api/treatings", TreatingRouter);
+app.use("/api/prescriptions", prescriptionRouter);
 
 //Global error handler
 app.use(errorHandler);
