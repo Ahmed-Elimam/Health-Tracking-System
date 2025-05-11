@@ -7,12 +7,12 @@ const { checkOwnership } = require("../middlewares/checkOwnership");
 
 router
   .route("/")
-  .get(verifyToken, authorizeRole("super-admin", "admin"), doctorController.getDoctors)
+  .get(verifyToken, authorizeRole("super-admin", "admin","patient"), doctorController.getDoctors)
   .post(verifyToken, authorizeRole("super-admin", "admin"), doctorController.createDoctor);
 
 router
   .route("/:id")
-  .get(verifyToken, authorizeRole("super-admin", "admin", "doctor"), checkOwnership, doctorController.getDoctor)
+  .get(verifyToken, doctorController.getDoctor)
   .patch(verifyToken, authorizeRole("super-admin","admin", "doctor"), checkOwnership, doctorController.updateDoctor)
   .delete(verifyToken, authorizeRole("super-admin", "admin"), checkOwnership, doctorController.deleteDoctor);
 
