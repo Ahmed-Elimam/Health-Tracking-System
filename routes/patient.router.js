@@ -17,24 +17,23 @@ router
     authorizeRole("super-admin", "admin"),
     patientController.createPatient
   );
+
 router
   .route("/:id")
   .get(
     verifyToken,
-    authorizeRole("super-admin", "admin", "patient"),
+    authorizeRole("super-admin", "admin"),
     checkOwnership,
     patientController.getPatient
   )
   .patch(
     verifyToken,
     authorizeRole("super-admin", "admin", "patient"),
-    checkOwnership,
     patientController.updatePatient
   )
   .delete(
     verifyToken,
-    authorizeRole("super-admin", "admin"),
-    checkOwnership,
+    authorizeRole("super-admin", "admin", "patient"),
     patientController.deletePatient
   );
 module.exports = router;

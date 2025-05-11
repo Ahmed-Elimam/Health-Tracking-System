@@ -5,7 +5,9 @@ const catchAsync = require("../utils/catchAsync.js");
 
 exports.createPatient = catchAsync(async (req, res, next) => {
   const patient = await PatientService.createPatient(req.body);
-  res.send(patient);
+  res.status(201).json({
+    patient,
+  });
 });
 
 exports.getPatients = catchAsync(async (req, res, next) => {
@@ -17,24 +19,58 @@ exports.getPatients = catchAsync(async (req, res, next) => {
     }
     const patients = await PatientService.getDoctorPatients(doctor._id);
 
-    res.send(patients);
+    res.status(200).json({
+      patients,
+    });
   } else {
     const patients = await PatientService.getPatients(req.query);
-    res.send(patients);
+    res.status(200).json({
+      patients,
+    });
   }
 });
 
 exports.getPatient = catchAsync(async (req, res, next) => {
-  const patient = await PatientService.getPatient(req.query.id);
-  res.send(patient);
+  const patient = await PatientService.getPatient(req.params.id);
+  res.status(200).json({
+    patient,
+  });
 });
 
 exports.updatePatient = catchAsync(async (req, res, next) => {
+  const patient = await PatientService.updatePatient(
+    req.user.role === "patient" ? req.user.id : req.params.id,
+    req.body
+  );
+  if (!patient) {
+    return next(new AppError("patient not Found", 404));
+  }
+  res.status(200).json({
+    status: "success",
+    data: {
+      patient: patient,
+    },
+  });
+});
+exports.updatePatient = catchAsync(async (req, res, next) => {
   const patient = await PatientService.updatePatient(req.params.id, req.body);
-  res.send(patient);
+  if (!patient) {
+    return next(new AppError("patient not Found", 404));
+  }
+  res.status(200).json({
+    status: "success",
+    data: {
+      patient: patient,
+    },
+  });
 });
 
 exports.deletePatient = catchAsync(async (req, res) => {
   const patient = await PatientService.deletePatient(req.params.id);
-  res.send(patient);
+  if (!patient) {
+    return next(new AppError("patient not Found", 404));
+  }
+  res.status(204).json({
+    status: "success",
+  });
 });
