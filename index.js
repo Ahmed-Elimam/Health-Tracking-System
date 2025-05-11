@@ -1,15 +1,14 @@
 const express = require("express");
 const errorHandler = require("./middlewares/errorHandler");
 require("dotenv").config();
-const dbConnect = require("./config/dbConnection")
+const dbConnect = require("./config/dbConnection");
 // require("./seeds/seedUsers");
 const app = express();
 const port = 7070;
 // mongoose.connect;
-dbConnect()
+dbConnect();
 //Middlewares
 app.use(express.json());
-
 
 //Routes
 const authRouter = require("./routes/auth.router");
@@ -21,7 +20,6 @@ app.use("/auth", authRouter);
 app.use("/patients", patientRouter);
 app.use("/doctors", doctorRouter);
 app.use("/admins", adminRouter);
-
 
 //Global error handler
 app.use(errorHandler);

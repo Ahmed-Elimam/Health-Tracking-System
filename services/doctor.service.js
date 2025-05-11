@@ -1,5 +1,4 @@
 const Doctor = require('../models/Doctor');
-const Specialization = require('../models/Specialization');
 const {parasQueryParams} = require('../utils/queryParser');
 
 const doctorResource_Patient = (doctor) => {
@@ -32,14 +31,14 @@ exports.getDoctor = async(doctorId,user) => {
     return await Doctor.findById(doctorId).populate("userId");
 }
 
-exports.createDoctor = async(doctorData) => {
-    return await Doctor.create(doctorData);
-}
+exports.createDoctor = async (doctorData) => {
+  return await Doctor.create(doctorData);
+};
 
-exports.updateDoctor = async(doctorId, doctorData) => {
-    return await Doctor.findByIdAndUpdate(doctorId, doctorData, {new: true});
-}
+exports.updateDoctor = async (doctorId, doctorData) => {
+  return await Doctor.findByIdAndUpdate(doctorId, doctorData, { new: true });
+};
 
-exports.deleteDoctor = async(doctorId) => {
-    return await Doctor.findByIdAndDelete(doctorId);
-}
+exports.deleteDoctor = async (doctorId) => {
+  return await Doctor.findByIdAndDelete(doctorId);
+};

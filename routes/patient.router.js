@@ -7,11 +7,34 @@ const { checkOwnership } = require("../middlewares/checkOwnership");
 
 router
   .route("/")
-  .get(verifyToken, authorizeRole("super-admin", "admin"), patientController.getPatients)
-  .post(verifyToken, authorizeRole("super-admin", "admin"), patientController.createPatient);
+  .get(
+    verifyToken,
+    authorizeRole("super-admin", "admin", "doctor"),
+    patientController.getPatients
+  )
+  .post(
+    verifyToken,
+    authorizeRole("super-admin", "admin"),
+    patientController.createPatient
+  );
 router
   .route("/:id")
-  .get(verifyToken, authorizeRole("super-admin", "admin", "patient"), checkOwnership, patientController.getPatient)
-  .patch(verifyToken, authorizeRole("super-admin", "admin", "patient"), checkOwnership, patientController.updatePatient)
-  .delete(verifyToken, authorizeRole("super-admin", "admin"),checkOwnership, patientController.deletePatient);
+  .get(
+    verifyToken,
+    authorizeRole("super-admin", "admin", "patient"),
+    checkOwnership,
+    patientController.getPatient
+  )
+  .patch(
+    verifyToken,
+    authorizeRole("super-admin", "admin", "patient"),
+    checkOwnership,
+    patientController.updatePatient
+  )
+  .delete(
+    verifyToken,
+    authorizeRole("super-admin", "admin"),
+    checkOwnership,
+    patientController.deletePatient
+  );
 module.exports = router;
