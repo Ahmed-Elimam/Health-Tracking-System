@@ -1,6 +1,7 @@
 const express = require("express");
 const errorHandler = require("./middlewares/errorHandler");
 require("dotenv").config();
+const path =require("path")
 const dbConnect = require("./config/dbConnection");
 // require("./seeds/seedUsers");
 const app = express();
@@ -9,6 +10,14 @@ const port = 9090;
 dbConnect();
 //Middlewares
 app.use(express.json());
+
+
+
+/* BY Mohamed Ragab */ 
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
+const paymentRoutes = require('./routes/payment.router');
+app.use('/', paymentRoutes);
+/* end of my edit */
 
 //Routes
 const authRouter = require("./routes/auth.router");
@@ -19,9 +28,7 @@ const SpecializationRouter = require("./routes/Specialization.router");
 const TreatingRouter = require("./routes/treating.router");
 const prescriptionRouter = require("./routes/prescription.router");
 
-app.get("/", (req, res) => {
-  res.send("OK");
-});
+
 app.use("/auth", authRouter);
 app.use("/api/patients", patientRouter);
 app.use("/api/admins", adminRouter);
@@ -29,6 +36,9 @@ app.use("/api/doctors", doctorRouter);
 app.use("/api/specializations", SpecializationRouter);
 app.use("/api/treatings", TreatingRouter);
 app.use("/api/prescriptions", prescriptionRouter);
+
+
+
 
 //Global error handler
 app.use(errorHandler);
