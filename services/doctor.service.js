@@ -14,14 +14,14 @@ exports.getDoctors_Admin = async (query) => {
     return await Doctor.find(filters).sort(sorts).populate(["userId","specialization"]);
 }
 exports.getDoctors_Patient = async (query,user) => {
-    const {filters, sorts} = parseQueryParams(query);
+    let {filters, sorts} = parseQueryParams(query);
     const patient = await Patient.findOne({userId: user.id});
-    const treatings = await Treating.find({patientId: patient._id},...filters).sort(sorts).populate("doctorId specialization");
+    const treatings = await Treating.find({patientId: patient._id,...filters}).sort(sorts).populate("doctorId");
     const oldDoctors = [];
     const currentDoctors = [];
     for (let i = 0; i < treatings.length; i++) {
-        if(treatings[i].isActive == false) oldDoctors.push(doctorResource_Patient(treatings[i].doctorId));
-        else currentDoctors.push(doctorResource_Patient(treatings[i].doctorId));
+        if(treatings[i].isActive == false) oldDoctors.push(doctorResource_Patient(await treatings[i].doctorId.populate("specialization")));
+        else currentDoctors.push(doctorResource_Patient(await treatings[i].doctorId.populate("specialization")));
     }
     return {oldDoctors, currentDoctors};
 }

@@ -11,7 +11,7 @@ exports.getDoctors = catchAsync( async (req, res,next) => {
         const doctors = await DoctorService.getDoctors_Admin(req.query);
         res.status(200).json(doctors);
     }
-    else if(user.role == "patient"){
+    else if(req.user.role == "patient"){
         const doctors = await DoctorService.getDoctors_Patient(req.query,req.user);
         res.status(200).json(doctors);
     }
