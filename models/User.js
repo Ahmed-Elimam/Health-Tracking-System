@@ -23,6 +23,11 @@ const userSchema = new Schema({
     passwordChangedAt: { type: Date },
     passwordResetExpires: { type: Date },
     token: { type: String, select: false },
+
+    mailVerificationToken: { type: String, select: false },
+    phoneVerificationToken: { type: String, select: false },
+    mailVerificationTokenExpires: { type: Date },
+    phoneVerificationTokenExpires: { type: Date },
 },{ timestamps: true });
 
 const User = mongoose.model('User', userSchema);

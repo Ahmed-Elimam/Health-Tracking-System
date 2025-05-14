@@ -5,11 +5,12 @@ const User = require('../models/User');
 const Patient = require('../models/Patient');
 const Doctor = require('../models/Doctor');
 const Specialization = require('../models/Specialization');
+const {sendVerificationEmail} = require('./mailing.service');
 
 exports.registerUser = async(userData) => {
     const {
         firstName, lastName, email, password,
-        nationalId, phone, specializationName, certificates, bio, experience, plan
+        nationalId, phone, specializationName, certificates, bio, experience, plan, address
     } = userData;
 
     if (!firstName || !lastName || !email || !password || !nationalId || !phone) {
@@ -55,6 +56,7 @@ exports.registerUser = async(userData) => {
             userId: newUser._id,
             plan});
     }
+    sendVerificationEmail(newUser);
     return newUser;
 }
 
@@ -69,9 +71,12 @@ exports.userLogin = async (userLoginData) =>{
     if (!isMatch) {
     throw new AppError("Invalid Credentials", 401);
     }
-
     let fullUserData = user.toObject();
     delete fullUserData.password;
+
+    if(fullUserData.emailVerified === false){
+        throw new AppError("Your email is not verified. Please verify your email", 401);
+    }
 
     let tokenPayload = {
         id: user._id,
