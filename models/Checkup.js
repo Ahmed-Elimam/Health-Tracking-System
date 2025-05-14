@@ -6,12 +6,11 @@ const checkupSchema = new Schema({
     doctorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor', required: true },
     patientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Patient', required: true },
     type: { type: String, enum: ['checkup', 'follow-up'], default: 'checkup' },
-    specialization: { type: String, required: true },
+    specialization: { type: mongoose.Schema.Types.ObjectId, ref: 'Specialization', required: true },
     checkupDate: { type: Date, required: true },
     symptoms: [{ type: String}],
     doctorSigns: [{ type: String}],
     diagnosis: { type: String },
-    prescription: { type: mongoose.Schema.Types.ObjectId, ref: 'Prescription' },
     doctorRecommendations: { type: String },
     followup: {
         needed: { type: Boolean, default: false }, 
