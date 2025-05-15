@@ -7,17 +7,19 @@ exports.getPatients = async (query) => {
   return await Patient.find(filters).sort(sorts).populate("userId");
 };
 exports.getDoctorPatients = async (docId) => {
-  // const { filters, sorts } = parseQueryParams(query);
-  // const treatingsCount = await Treating.countDocuments({ doctorId: docId });
-  // console.log(treatingsCount);
-
-  let treatings = await Treating.find({ doctorId: docId }).populate({
+  const treatings = await Treating.find({ doctorId: docId }).populate({
     path: "patientId",
     populate: { path: "userId" },
   });
 
-  const patients = treatings.map((t) => t.patientId);
-  return patients;
+  const uniquePatients = new Map();
+
+  treatings.forEach(t => {
+    const patient = t.patientId;
+    uniquePatients.set(patient._id.toString(), patient);
+  });
+
+  return Array.from(uniquePatients.values());
 };
 exports.getPatient = async (patientId) => {
   return await Patient.findOne({ _id: patientId }).populate("userId");
