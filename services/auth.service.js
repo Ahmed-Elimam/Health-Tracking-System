@@ -90,17 +90,17 @@ exports.userLogin = async (userLoginData) =>{
     }
 
     if (user.role === 'patient') {
-        const patientData = await Patient.findOne({ userId: user._id }).populate('userId');
+        const patientData = await Patient.findOne({ userId: user._id });
         if (patientData){
-            fullUserData = patientData;
+            fullUserData = {...fullUserData, ...patientData.toObject()};
             tokenPayload.patientId = patientData._id;
         }
     }
 
     if (user.role === 'doctor') {
-    const doctorData = await Doctor.findOne({ userId: user._id }).populate('userId specialization');
+    const doctorData = await Doctor.findOne({ userId: user._id }).populate('specialization');
     if (doctorData){
-        fullUserData = doctorData;
+        fullUserData = {...fullUserData, ...doctorData.toObject()};
         tokenPayload.doctorId = doctorData._id;
     }
     }
