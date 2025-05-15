@@ -27,6 +27,7 @@ const adminRouter = require("./routes/admin.router");
 const SpecializationRouter = require("./routes/Specialization.router");
 const TreatingRouter = require("./routes/treating.router");
 const prescriptionRouter = require("./routes/prescription.router");
+const checkupRouter = require("./routes/checkup.router");
 
 
 app.use("/auth", authRouter);
@@ -36,6 +37,7 @@ app.use("/api/doctors", doctorRouter);
 app.use("/api/specializations", SpecializationRouter);
 app.use("/api/treatings", TreatingRouter);
 app.use("/api/prescriptions", prescriptionRouter);
+app.use("/api/checkups", checkupRouter);
 
 
 
