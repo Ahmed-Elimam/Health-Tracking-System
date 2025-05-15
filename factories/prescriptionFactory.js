@@ -4,7 +4,7 @@ const Checkup = require("../models/Checkup");
 const generatePrescriptionData = async (overrides = {}) => {
     let checkupDoc = overrides.checkup;
     if(!checkupDoc) {
-        const randomCheckup = Math.floor(Math.random() * Checkup.countDocuments());
+        const randomCheckup = Math.floor(Math.random() * await Checkup.countDocuments());
         checkupDoc = await Checkup.findOne().skip(randomCheckup).lean();
     }
     return {

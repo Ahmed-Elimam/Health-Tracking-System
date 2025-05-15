@@ -35,7 +35,8 @@ exports.registerUser = async(userData) => {
               email,
               password: hashedPassword,
               nationalId,
-              phone});
+              phone,
+              address});
     
     if (specializationName) {
         const specialization = await Specialization.findOne({ name: specializationName });
