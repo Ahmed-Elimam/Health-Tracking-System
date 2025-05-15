@@ -3,11 +3,22 @@ const errorHandler = require("./middlewares/errorHandler");
 require("dotenv").config();
 const path =require("path")
 const dbConnect = require("./config/dbConnection");
-// require("./seeds/seedUsers");
+const cors = require('cors');
+
+
 const app = express();
 const port = 9090;
 // mongoose.connect;
 dbConnect();
+
+
+
+// allow access from Frontend
+app.use(cors({
+  origin: 'http://localhost:4200',
+  credentials: true, // if you're sending cookies
+}));
+
 //Middlewares
 app.use(express.json());
 
@@ -30,7 +41,7 @@ const prescriptionRouter = require("./routes/prescription.router");
 const checkupRouter = require("./routes/checkup.router");
 
 
-app.use("/auth", authRouter);
+app.use("/api/auth", authRouter);
 app.use("/api/patients", patientRouter);
 app.use("/api/admins", adminRouter);
 app.use("/api/doctors", doctorRouter);
@@ -44,6 +55,7 @@ app.use("/api/checkups", checkupRouter);
 
 //Global error handler
 app.use(errorHandler);
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
