@@ -7,7 +7,7 @@ const Doctor = require('../models/Doctor');
 const Specialization = require('../models/Specialization');
 const {sendVerificationEmail} = require('./mailing.service');
 
-exports.registerUser = async(userData) => {
+exports.registerUser = async(userData,file) => {
     const {
         firstName, lastName, email, password,
         nationalId, phone, specializationName, certificates, bio, experience, plan, address
@@ -28,46 +28,51 @@ exports.registerUser = async(userData) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+    let profileImage = null;
+    if (file){
+        profileImage = file.path;
+    }
     const newUser = await User.create({
-              firstName,
-              lastName,
-              email,
-              password: hashedPassword,
-              nationalId,
-              phone,
-              address});
-    
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        nationalId,
+        phone,
+        address,
+        profileImage
+    });
+
     if (specializationName) {
         const specialization = await Specialization.findOne({ name: specializationName });
         if (!specialization) {
             throw new AppError("Specialization not found", 400);
         }
 
-        await Doctor.create({
-            userId: newUser._id,
-            specialization: specialization._id,
-            certificates,
-            bio,
-            experience});
-        }
+    await Doctor.create({
+        userId: newUser._id,
+        specialization: specialization._id,
+        certificates,
+        bio,
+        experience});
+    }
 
     if (plan) {
         await Patient.create({
             userId: newUser._id,
             plan});
     }
-    sendVerificationEmail(newUser);
+    await sendVerificationEmail(newUser);
     return newUser;
 }
 
 exports.userLogin = async (userLoginData) =>{
-    const { email, password } = userLoginData;
-    const user = await User.findOne({ email }).select('+password');
+    const { login, password } = userLoginData;
+    const user = await User.findOne({ email:login }).select('+password');
+    console.log(user, userLoginData);
     if (!user) {
     throw new AppError("Invalid Credentials", 401);
     }
-
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
     throw new AppError("Invalid Credentials", 401);
@@ -85,11 +90,11 @@ exports.userLogin = async (userLoginData) =>{
     }
 
     if (user.role === 'patient') {
-    const patientData = await Patient.findOne({ userId: user._id }).populate('userId');
-    if (patientData){
-        fullUserData = patientData;
-        tokenPayload.patientId = patientData._id;
-    } 
+        const patientData = await Patient.findOne({ userId: user._id }).populate('userId');
+        if (patientData){
+            fullUserData = patientData;
+            tokenPayload.patientId = patientData._id;
+        }
     }
 
     if (user.role === 'doctor') {
