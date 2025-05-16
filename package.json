@@ -7,7 +7,7 @@
     "type": "commonjs",
     "main": "index.js",
     "scripts": {
-        "seed": "node seeds/seedPatients.js && node index.js",
+        "seed": "node seeds/seedUsers.js && node seeds/seedSpecialization.js && node seeds/seedDoctors.js && node seeds/seedPatients.js && node seeds/seedThreads_Checkups.js",
         "dev": "nodemon index.js",
         "start": "node index.js",
         "debug": "node --inspect index.js"

@@ -15,7 +15,6 @@ async function seed() {
     const DoctorCount = await Doctor.countDocuments();
     const threadCount = await Thread.countDocuments();
     // console.log(patientCount, specializationCount, DoctorCount, threadCount);
-    await dbConnect();
     for (let i = 0; i < 10; i++) {
         const thread = await createThread();
         const randomInt = Math.floor(Math.random() * 3) + 1;
