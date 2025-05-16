@@ -14,16 +14,10 @@ router
     )
     .post(
         verifyToken,
-        authorizeRole('super-admin', 'admin'),
+        authorizeRole('super-admin', 'admin','doctor', 'patient'),
         checkupController.createCheckups
     );
-// router
-//   .route("/my-patient/:id")
-//   .get(
-//     verifyToken,
-//     authorizeRole("super-admin", "admin", "patient", "doctor"),
-//     checkupController.getCheckups
-//   );
+
 router
     .route('/:id')
     .get(
