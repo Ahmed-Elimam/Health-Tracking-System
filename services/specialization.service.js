@@ -1,6 +1,6 @@
-const Specialization = require("../models/Specialization");
+const Specialization = require('../models/Specialization');
 
-exports.createSpecialization = async (specializationData) => {
+exports.createSpecialization = async specializationData => {
     const specialization = await Specialization.create(specializationData);
     return specialization;
 };
@@ -10,17 +10,21 @@ exports.getSpecializations = async () => {
     return specializations;
 };
 
-exports.getSpecialization = async (id) => {
+exports.getSpecialization = async id => {
     const specialization = await Specialization.findById(id).lean();
     return specialization;
 };
 
 exports.updateSpecialization = async (id, specializationData) => {
-    const specialization = await Specialization.findByIdAndUpdate(id, specializationData, { new: true });
+    const specialization = await Specialization.findByIdAndUpdate(
+        id,
+        specializationData,
+        { new: true }
+    );
     return specialization;
 };
 
-exports.deleteSpecialization = async (id) => {
+exports.deleteSpecialization = async id => {
     const specialization = await Specialization.findByIdAndDelete(id);
     return specialization;
 };

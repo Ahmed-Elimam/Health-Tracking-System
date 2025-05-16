@@ -1,21 +1,29 @@
-const {faker} = require("@faker-js/faker");
-const Doctor = require("../models/Doctor");
-const Specialization = require("../models/Specialization");
-const User = require("../models/User");
+const { faker } = require('@faker-js/faker');
+const Doctor = require('../models/Doctor');
+const Specialization = require('../models/Specialization');
+const User = require('../models/User');
 
-const generateDoctorData = async (overrides = {},specializationCount,userCount) => {
+const generateDoctorData = async (
+    overrides = {},
+    specializationCount,
+    userCount
+) => {
     let specializationDoc = overrides.specialization;
-    if(!specializationDoc) {
-        const randomSpecialization = Math.floor(Math.random() * specializationCount);
-        specializationDoc = await Specialization.findOne().skip(randomSpecialization).lean();
+    if (!specializationDoc) {
+        const randomSpecialization = Math.floor(
+            Math.random() * specializationCount
+        );
+        specializationDoc = await Specialization.findOne()
+            .skip(randomSpecialization)
+            .lean();
     }
     let userDoc = overrides.user;
-    if(!userDoc) {
+    if (!userDoc) {
         const randomUser = Math.floor(Math.random() * userCount);
         userDoc = await User.findOne().skip(randomUser).lean();
     }
     return {
-        userId: userDoc._id, 
+        userId: userDoc._id,
         specialization: specializationDoc._id,
         certificates: [
             {
@@ -33,9 +41,13 @@ const generateDoctorData = async (overrides = {},specializationCount,userCount) 
         experience: faker.number.int({ min: 0, max: 50 }),
         ...overrides, // allows you to overwrite any field (optional)
     };
-}
+};
 
-exports.createDoctor = async(doctorData,specializationCount,userCount) => {
-    const data = await generateDoctorData(doctorData,specializationCount,userCount);
+exports.createDoctor = async (doctorData, specializationCount, userCount) => {
+    const data = await generateDoctorData(
+        doctorData,
+        specializationCount,
+        userCount
+    );
     return await Doctor.create(data);
-}
+};
