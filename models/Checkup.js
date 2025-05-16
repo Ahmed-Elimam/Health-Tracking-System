@@ -10,7 +10,6 @@ const checkupSchema = new Schema(
         threadId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Thread',
-            required: true,
         },
         doctorId: {
             type: mongoose.Schema.Types.ObjectId,
