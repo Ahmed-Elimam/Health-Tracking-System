@@ -97,3 +97,10 @@ exports.acceptAccess = catchAsync(async (req, res, next) => {
         data:{message:"Access granted successfully"}
     });
 });
+
+exports.searchPatientsToRequestAccess = catchAsync(async (req, res, next) => {
+    const patients = await PatientService.searchPatientsToRequestAccess(req.query);
+    res.status(200).json({
+        patients,
+    });
+})

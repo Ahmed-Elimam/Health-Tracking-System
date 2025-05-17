@@ -19,9 +19,14 @@ router
     );
 
 router
-.post('/:id/request-access',verifyToken,authorizeRole("doctor"),patientController.requestAccess);
+    .get("/search",verifyToken,authorizeRole("doctor"),patientController.searchPatientsToRequestAccess);
+
 router
 .post('/accept-access',verifyToken,authorizeRole("patient"),patientController.acceptAccess);
+
+router
+.post('/:id/request-access',verifyToken,authorizeRole("doctor"),patientController.requestAccess);
+
 router
     .route('/:id')
     .get(
@@ -41,4 +46,5 @@ router
         patientController.deletePatient
     );
 
+       
 module.exports = router;

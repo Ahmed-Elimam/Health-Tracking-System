@@ -144,3 +144,21 @@ exports.acceptRequestAccess = async (userId, doctorId) => {
 
     return updatedPatient;
 };
+
+exports.searchPatientsToRequestAccess = async (query) => {
+    const { filters, sorts } = parseQueryParams(query);
+    
+    if(Object.keys(filters).length === 0 || !filters){
+        throw new AppError("Filters not found", 404);
+    }
+
+    const patients = await User.find({...filters,role:"patient"},{firstName:1,lastName:1}).sort(sorts);
+    const results = patients.map(patient => {
+        return {
+            id: patient._id,
+            firstName: patient.firstName,
+            lastName: patient.lastName[0]+'*********',
+        };
+    })
+    return results;
+}
