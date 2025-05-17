@@ -3,6 +3,7 @@ const PatientService = require('../services/patient.service.js');
 const AppError = require('../utils/AppError');
 const catchAsync = require('../utils/catchAsync.js');
 
+
 exports.createPatient = catchAsync(async (req, res, next) => {
     const patient = await PatientService.createPatient(req.body);
     res.status(201).json({
@@ -76,12 +77,23 @@ exports.deletePatient = catchAsync(async (req, res) => {
 });
 
 exports.requestAccess = catchAsync(async (req, res, next) => {
-    const patient = await PatientService.requestAccess(req.params.id, req.doctorId);
+    const patient = await PatientService.requestAccess(req.user.id, req.params.id);
     if (!patient) {
         return next(new AppError('patient not Found', 404));
     }
     res.status(200).json({
         status: 'success',
         data:{message:"Request sent successfully"}
+    });
+});
+
+exports.acceptAccess = catchAsync(async (req, res, next) => {
+    const patient = await PatientService.acceptRequestAccess(req.user.id, req.body.doctorId);
+    if (!patient) {
+        return next(new AppError('patient not Found', 404));
+    }
+    res.status(200).json({
+        status: 'success',
+        data:{message:"Access granted successfully"}
     });
 });

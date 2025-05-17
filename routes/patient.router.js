@@ -20,7 +20,8 @@ router
 
 router
 .post('/:id/request-access',verifyToken,authorizeRole("doctor"),patientController.requestAccess);
-
+router
+.post('/accept-access',verifyToken,authorizeRole("patient"),patientController.acceptAccess);
 router
     .route('/:id')
     .get(

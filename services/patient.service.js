@@ -2,6 +2,10 @@ const Patient = require('../models/Patient');
 const User = require('../models/User');
 const Treating = require('../models/Treating');
 const { parseQueryParams } = require('../utils/parseQueryParams');
+const AppError = require('../utils/AppError');
+const Doctor = require('../models/Doctor');
+const mongoose = require('mongoose');
+
 exports.getPatients = async query => {
     const { filters, sorts } = parseQueryParams(query);
     return await Patient.find(filters).sort(sorts).populate('userId');
@@ -68,16 +72,75 @@ exports.deletePatient = async patientId => {
         session.endSession();
         next(error);
     }
-    exports.requestAccess = async (patientId,doctorId) => {
-        const patient = await Patient.findOne({ _id: patientId });
-        if(patient.accessRequests.includes(doctorId)) return patient;
-        const updatedPatient = await Patient.findOneAndUpdate(
-            { _id: patientId },
-            {accessRequests: [...patient.accessRequests,doctorId]},
-            {
-                new: true,
-            }
-        );
-        return updatedPatient;
-    };
+};
+exports.requestAccess = async (userId, patientId) => {
+    try {
+        const [patient, doctor] = await Promise.all([
+            Patient.findById(patientId),
+            Doctor.findOne({ userId }),        ]);
+
+        if (!patient) {
+            throw new AppError("Patient not found", 404);
+        }
+
+        if (!doctor) {
+            throw new AppError("Doctor not found", 404);
+        }
+
+        const treating = await Treating.findOne({
+            patientId: patient._id,
+            doctorId: doctor._id,
+            treatmentEndDate: { $gt: new Date() },
+        });
+        if (treating) {
+            throw new AppError("Access already granted", 400);
+        }
+        const doctorIdStr = doctor._id.toString();
+        const requests = patient.accessRequests || [];
+
+        const alreadyRequested = requests.some(id => id.toString() === doctorIdStr);
+        if (alreadyRequested) {
+            throw new AppError("Access request already sent", 400);
+        }
+
+        requests.push(doctor._id);
+        patient.accessRequests = requests;
+
+        await patient.save();
+        return patient;
+
+    } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError("An unexpected error occurred", 500, [error]);
+    }
+};
+exports.acceptRequestAccess = async (userId, doctorId) => {
+    const patient = await Patient.findOne({ userId });
+
+    if (!patient) {
+        throw new AppError("Patient not found", 404);
+    }
+
+    // Check if the doctorId exists in accessRequests
+    const hasRequest = patient.accessRequests.some(id => id.equals(doctorId));
+    if (!hasRequest) {
+        throw new AppError("Access request not found", 404);
+    }
+
+    // Remove the doctorId from accessRequests
+    patient.accessRequests = patient.accessRequests.filter(
+        id => !id.equals(doctorId)
+    );
+    const updatedPatient = await patient.save();
+
+    // Create Treating record
+    await Treating.create({
+        patientId: patient._id,
+        doctorId,
+        treatmentStartDate: new Date(),
+        treatmentEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        isActive: true
+    });
+
+    return updatedPatient;
 };
