@@ -35,7 +35,6 @@ exports.sendVerificationEmail = async user => {
     try {
         // Check if user is already verified
         if (user.emailVerified) {
-            console.log(`User ${user.email} is already verified`);
             return;
         }
         // Generate token
@@ -64,7 +63,6 @@ exports.sendVerificationEmail = async user => {
             html,
         });
 
-        console.log(`Verification email sent to ${user.email}`);
     } catch (err) {
         console.error('Error sending verification email:', err);
         throw new Error('Could not send verification email');

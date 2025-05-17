@@ -16,7 +16,6 @@ const errorHandler = (err, req, res, next) => {
             field => `${field} already exists`
         );
     }
-    console.log('Sending error response as JSON', res.getHeaders());
     res.status(statusCode).json({
         statusCode,
         message,
