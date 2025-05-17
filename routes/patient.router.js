@@ -19,6 +19,9 @@ router
     );
 
 router
+.post('/:id/request-access',verifyToken,authorizeRole("doctor"),patientController.requestAccess);
+
+router
     .route('/:id')
     .get(
         verifyToken,
@@ -36,4 +39,5 @@ router
         authorizeRole('super-admin', 'admin', 'patient'),
         patientController.deletePatient
     );
+
 module.exports = router;

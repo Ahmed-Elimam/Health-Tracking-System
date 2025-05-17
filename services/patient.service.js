@@ -68,4 +68,16 @@ exports.deletePatient = async patientId => {
         session.endSession();
         next(error);
     }
+    exports.requestAccess = async (patientId,doctorId) => {
+        const patient = await Patient.findOne({ _id: patientId });
+        if(patient.accessRequests.includes(doctorId)) return patient;
+        const updatedPatient = await Patient.findOneAndUpdate(
+            { _id: patientId },
+            {accessRequests: [...patient.accessRequests,doctorId]},
+            {
+                new: true,
+            }
+        );
+        return updatedPatient;
+    };
 };

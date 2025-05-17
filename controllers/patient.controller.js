@@ -74,3 +74,14 @@ exports.deletePatient = catchAsync(async (req, res) => {
         status: 'success',
     });
 });
+
+exports.requestAccess = catchAsync(async (req, res, next) => {
+    const patient = await PatientService.requestAccess(req.params.id, req.doctorId);
+    if (!patient) {
+        return next(new AppError('patient not Found', 404));
+    }
+    res.status(200).json({
+        status: 'success',
+        data:{message:"Request sent successfully"}
+    });
+});
