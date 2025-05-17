@@ -19,6 +19,9 @@ router
     );
 
 router
+    .get("/access-requests",verifyToken,authorizeRole("patient"),doctorController.getDoctorsRequestingAccess);
+
+router
     .route('/:id')
     .get(verifyToken, doctorController.getDoctor)
     .patch(

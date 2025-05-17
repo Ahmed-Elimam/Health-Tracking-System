@@ -89,3 +89,18 @@ exports.updateDoctor_Doctor = async (doctorId, doctorData, userId) => {
 exports.deleteDoctor = async doctorId => {
     return await Doctor.findByIdAndDelete(doctorId);
 };
+
+
+exports.getDoctorsRequestingAccess = async (userId) => {
+    const patient = await Patient.findOne({ userId });
+    if (!patient) {
+        throw new AppError("Patient not found", 404);
+    }
+    if(!patient.accessRequests || patient.accessRequests.length == 0) return [];
+    let doctors = await Doctor.find({ _id: { $in: patient.accessRequests } }).populate('userId').lean();
+    let results = [];
+    doctors.forEach(doctor => {
+        results.push(doctorResource_Patient(doctor));
+    })
+    return results;
+};

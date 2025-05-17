@@ -63,3 +63,12 @@ exports.deleteDoctor = catchAsync(async (req, res) => {
     const doctor = await DoctorService.deleteDoctor(req.params.id);
     res.status(200).json(doctor);
 });
+
+
+exports.getDoctorsRequestingAccess = catchAsync(async (req, res, next) => {
+    const doctors = await DoctorService.getDoctorsRequestingAccess(req.user.id);
+    res.status(200).json({
+        status: 'success',
+        data: doctors,
+    });
+});
