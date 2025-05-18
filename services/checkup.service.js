@@ -11,9 +11,9 @@ exports.getCheckups = async query => {
 exports.getDoctorCheckups = async doctorId => {
     // const { filters, sorts } = parseQueryParams(query);
 
-    const myOwnCheckups = await Checkup.find({ createdBy: doctorId }).populate(
-        'patientId'
-    );
+    const myOwnCheckups = await Checkup.find({ createdBy: doctorId }).populate({
+        path: 'patientId',populate:{path: 'userId', select: 'firstName lastName'} //to get patients name with the respons 
+    });
 
     const validTreatings = await Treating.find(
         {
