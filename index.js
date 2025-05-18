@@ -36,6 +36,7 @@ const SpecializationRouter = require('./routes/Specialization.router');
 const TreatingRouter = require('./routes/treating.router');
 const prescriptionRouter = require('./routes/prescription.router');
 const checkupRouter = require('./routes/checkup.router');
+const threadRouter = require('./routes/thread.router');
 
 app.use('/api/auth', authRouter);
 app.use('/api/patients', patientRouter);
@@ -45,6 +46,8 @@ app.use('/api/specializations', SpecializationRouter);
 app.use('/api/treatings', TreatingRouter);
 app.use('/api/prescriptions', prescriptionRouter);
 app.use('/api/checkups', checkupRouter);
+app.use('/api/threads', threadRouter);
+
 
 //Global error handler
 app.use(errorHandler);

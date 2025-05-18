@@ -1,12 +1,11 @@
 const Thread = require('../models/Thread');
-const { parseQueryParams } = require('../utils/parseQueryParams');
-exports.getThreads = async query => {
-    const { filters, sorts } = parseQueryParams(query);
-    return await Thread.find(filters).sort(sorts);
+
+exports.getThreads = async () => {
+    return await Thread.find({}).lean();
 };
 
 exports.getThread = async threadId => {
-    return await Thread.findById(threadId);
+    return await Thread.findById(threadId).lean();
 };
 
 exports.createThread = async threadData => {
