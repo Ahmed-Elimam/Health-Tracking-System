@@ -1,4 +1,5 @@
 const Checkup = require('../models/Checkup');
+const Patient = require('../models/Patient');
 const Treating = require('../models/Treating');
 const AppError = require('../utils/AppError');
 const { parseQueryParams } = require('../utils/parseQueryParams');
@@ -53,9 +54,7 @@ exports.getPatientCheckups = async patientId => {
         { doctorId: 1 }
     );
     if (!validTreatings) {
-        return next(
-            new AppError('You are not authorized to view these checkups', 403)
-        );
+            throw new AppError('You are not authorized to view these checkups', 403);
     }
     const acceptedDoctorIds = validTreatings.map(t => t.doctorId);
 
@@ -65,7 +64,7 @@ exports.getPatientCheckups = async patientId => {
     }).populate('patientId');
 
     if (!acceptedDoctorCheckups) {
-        next(new AppError('there is no checkups for this doctor', 404));
+        throw new AppError('there is no checkups for this doctor', 404);
     }
     return { myOwnCheckups, acceptedDoctorCheckups };
 };
@@ -92,21 +91,22 @@ exports.getDoctorCheckup = async (doctorId, checkupId) => {
     return myCheckup;
 };
 
-exports.getPatientCheckup = async (patientId, checkupId) => {
+exports.getPatientCheckup = async (userId, checkupId) => {
+    const patient = await Patient.findOne({ userId }).lean();
     let checkup = await Checkup.findOne({
         _id: checkupId,
     }).populate('patientId');
-    if (!(patientId === checkup.patientId._id)) {
-        next(new AppError('there is no checkups for this patient', 404));
+    if (patient._id.toString() !== checkup.patientId._id.toString()) {
+        throw new AppError('there is no checkups for this patient', 404);
     }
     const doctorId = checkup.doctorId._id;
     const treating = await Treating.findOne({
         doctorId,
-        patientId,
+        patientId: patient._id,
         treatmentEndDate: { $gt: new Date() },
     }).populate('patientId');
     if (!treating) {
-        new AppError('You are not authorized to view this checkups', 403);
+        throw new AppError('You are not authorized to view this checkups', 403);
     }
     return checkup;
 };
