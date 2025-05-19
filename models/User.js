@@ -38,6 +38,7 @@ const userSchema = new Schema(
         passwordChangedAt: { type: Date },
         passwordResetExpires: { type: Date },
         token: { type: String, select: false },
+        refreshToken: { type: String, select: false },
         mailVerificationToken: { type: String, select: false },
         phoneVerificationToken: { type: String, select: false },
         mailVerificationTokenExpires: { type: Date },

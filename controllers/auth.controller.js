@@ -2,6 +2,8 @@ const authService = require('../services/auth.service');
 const User = require('../models/User');
 const AppError = require('../utils/AppError');
 const crypto = require('crypto');
+const catchAsync = require('../utils/catchAsync');
+
 const register = async (req, res, next) => {
     try {
         const newUser = await authService.registerUser(req.body, req.file);
@@ -16,8 +18,9 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
     try {
-        const { token, fullUserData } = await authService.userLogin(req.body);
-        res.status(200).json({ token, user: fullUserData });
+        const { token, fullUserData, refreshToken } = await authService.userLogin(req.body);
+        await User.updateOne({ _id: fullUserData._id }, { $set: { refreshToken ,token} });
+        res.status(200).json({ token, refreshToken, user: fullUserData });
     } catch (error) {
         next(error);
     }
@@ -43,8 +46,13 @@ const verify = async (req, res, next) => {
 
     res.send('Email verified successfully!');
 };
+const refresh = catchAsync(async (req, res, next) => {
+    const { accessToken:token, refreshToken } = await authService.refresh(req.body.refreshToken);
+    res.status(200).json({ token,refreshToken });
+});
 module.exports = {
     register,
     login,
     verify,
+    refresh,
 };

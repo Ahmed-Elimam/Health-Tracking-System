@@ -90,26 +90,25 @@ exports.registerUser = async (userData, file) => {
 exports.userLogin = async userLoginData => {
     const { login, password } = userLoginData;
     const user = await User.findOne({ email: login }).select('+password');
-    // console.log(user, userLoginData);
+
     if (!user) {
         throw new AppError('Invalid Credentials', 401);
     }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
         throw new AppError('Invalid Credentials', 401);
     }
+
+    if (user.emailVerified === false) {
+        throw new AppError('Your email is not verified. Please verify your email', 401);
+    }
+
     let fullUserData = user.toObject();
     delete fullUserData.password;
 
-    if (fullUserData.emailVerified === false) {
-        throw new AppError(
-            'Your email is not verified. Please verify your email',
-            401
-        );
-    }
-
-    let tokenPayload = {
-        id: user._id,
+    const tokenPayload = {
+        userId: user._id,
         role: user.role,
     };
 
@@ -124,18 +123,72 @@ exports.userLogin = async userLoginData => {
     if (user.role === 'doctor') {
         const doctorData = await Doctor.findOne({ userId: user._id });
         const patientData = await Patient.findOne({ userId: user._id });
+
         if (doctorData) {
             fullUserData.doctor = doctorData;
             tokenPayload.doctorId = doctorData._id;
         }
+
         if (patientData) {
             fullUserData.patient = patientData;
             tokenPayload.patientId = patientData._id;
         }
     }
-    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
-        expiresIn: '1h',
+
+    const {  accessToken: token, refreshToken } = generateTokens(tokenPayload);
+
+    return { token, fullUserData, refreshToken };
+};
+exports.refresh = async (refreshToken) => {
+    if (!refreshToken) {
+        return next(new AppError('Refresh token is required', 400));
+    }
+
+    try {
+
+        const user = await User.findOne({refreshToken});
+        if (!user) {
+            return next(new AppError('User not found', 401));
+        }
+
+        const payload = {
+            userId: user._id,
+            role: user.role,
+        };
+
+        if (user.role === 'patient') {
+            const patient = await Patient.findOne({ userId: user._id });
+            if (patient) payload.patientId = patient._id;
+        }
+
+        if (user.role === 'doctor') {
+            const doctor = await Doctor.findOne({ userId: user._id });
+            if (doctor) payload.doctorId = doctor._id;
+
+            // In case the doctor is also a patient:
+            const patient = await Patient.findOne({ userId: user._id });
+            if (patient) payload.patientId = patient._id;
+        }
+
+        const result = generateTokens(payload);
+        user.token = result.accessToken;
+        user.refreshToken = result.refreshToken;
+        await user.save();
+        return result;
+
+    } catch (error) {
+        throw new AppError('Invalid or expired refresh token', 401);
+    }
+};
+
+const generateTokens = (payload) => {
+    const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: '1d', // or shorter for better security
     });
 
-    return { token, fullUserData };
+    const refreshToken = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: '30d',
+    });
+
+    return { accessToken, refreshToken };
 };
